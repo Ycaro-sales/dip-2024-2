@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import cv2
 
+
 def generate_image(seed, width, height, mean, std):
     """
     Generates a grayscale image with pixel values sampled from a normal distribution.
@@ -16,22 +17,27 @@ def generate_image(seed, width, height, mean, std):
     Returns:
         image (numpy.ndarray): The generated image.
     """
-    ### START CODE HERE ###
-    ### TODO
-    ### END CODE HERE ###
+    rng = np.random.default_rng(seed=seed)
+    image = rng.normal(loc=mean, scale=std, size=(width, height))
+    image = np.clip(image, a_min=0, a_max=255)
 
     return image
 
+
 def main():
     # Argument parser
-    parser = argparse.ArgumentParser(description="Generate an image with pixel values sampled from a normal distribution.")
+    parser = argparse.ArgumentParser(
+        description="Generate an image with pixel values sampled from a normal distribution.")
 
-    parser.add_argument('--registration_number', type=int, required=True, help="Student's registration number (used as seed)")
+    parser.add_argument('--registration_number', type=int, required=True,
+                        help="Student's registration number (used as seed)")
     parser.add_argument('--width', type=int, required=True, help="Width of the image")
     parser.add_argument('--height', type=int, required=True, help="Height of the image")
     parser.add_argument('--mean', type=float, required=True, help="Mean of the normal distribution")
-    parser.add_argument('--std', type=float, required=True, help="Standard deviation of the normal distribution")
-    parser.add_argument('--output', type=str, required=True, help="Path to save the generated image")
+    parser.add_argument('--std', type=float, required=True,
+                        help="Standard deviation of the normal distribution")
+    parser.add_argument('--output', type=str, required=True,
+                        help="Path to save the generated image")
 
     args = parser.parse_args()
 
@@ -42,6 +48,7 @@ def main():
     cv2.imwrite(args.output, image)
 
     print(f"Image successfully generated and saved to {args.output}")
+
 
 if __name__ == "__main__":
     main()
