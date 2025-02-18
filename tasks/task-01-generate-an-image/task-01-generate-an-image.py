@@ -18,7 +18,7 @@ def generate_image(seed, width, height, mean, std):
         image (numpy.ndarray): The generated image.
     """
     rng = np.random.default_rng(seed=seed)
-    image = rng.normal(loc=mean, scale=std, size=(width, height)).as_type(np.int8)
+    image = rng.normal(loc=mean, scale=std, size=(width, height)).as_type(np.uint8)
     image = np.clip(image, a_min=0, a_max=255)
 
     return image
