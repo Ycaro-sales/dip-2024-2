@@ -22,7 +22,7 @@ def linear_combination(i1: np.ndarray, i2: np.ndarray, a1: float, a2: float) -> 
 
     scaledi1 = (i1[:, :, :] * a1).astype(np.uint8)
     scaledi2 = (i2[:, :, :] * a2).astype(np.uint8)
-    result = np.add(scaledi1, scaledi2)
+    result = np.add(scaledi1, scaledi2).clip(0, 255)
 
     return result
 
