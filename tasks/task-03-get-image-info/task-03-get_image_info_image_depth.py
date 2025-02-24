@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def get_image_info(image: np.ndarray):
@@ -14,11 +15,8 @@ def get_image_info(image: np.ndarray):
 
     width = image.shape[0]
     height = image.shape[1]
-    if len(image.shape) < 3:
-        depth = 1
-    else:
-        depth = image.shape[2]
-    dtype = image.dtype
+    depth = np.ma.minimum_fill_value(image) + 1
+    dtype = type(image.dtype)
     max_val = image.max()
     min_val = image.min()
     mean_val = np.mean(image)

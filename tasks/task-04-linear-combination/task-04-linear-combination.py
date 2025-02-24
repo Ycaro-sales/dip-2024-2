@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def linear_combination(i1: np.ndarray, i2: np.ndarray, a1: float, a2: float) -> np.ndarray:
     """
     Compute the linear combination of two images using OpenCV: 
@@ -19,11 +20,12 @@ def linear_combination(i1: np.ndarray, i2: np.ndarray, a1: float, a2: float) -> 
     if i1.shape != i2.shape:
         raise ValueError("Input images must have the same dimensions.")
 
-    ### START CODE HERE ###
-    ### TODO
-    ### END CODE HERE ###
+    scaledi1 = (i1[:, :, :] * a1).astype(np.uint8)
+    scaledi2 = (i2[:, :, :] * a2).astype(np.uint8)
+    result = np.add(scaledi1, scaledi2)
 
-    return None
+    return result
+
 
 # Example Usage
 if __name__ == "__main__":
