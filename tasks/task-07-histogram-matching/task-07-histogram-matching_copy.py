@@ -64,7 +64,7 @@ def inverse_hist_map(img: np.ndarray) -> dict:
     return inv_map
 
 
-def histogram_matching(src: np.ndarray, ref: np.ndarray) -> np.ndarray:
+def histogram_matching_color(src: np.ndarray, ref: np.ndarray) -> np.ndarray:
     eq_src, _ = histogram_equalization(src)
     _, ref_map = histogram_equalization(ref)
 
@@ -75,6 +75,27 @@ def histogram_matching(src: np.ndarray, ref: np.ndarray) -> np.ndarray:
         matched_img[i] = inv_map[v]
 
     return matched_img
+
+
+def histogram_matching(src: np.ndarray, ref: np.ndarray) -> np.ndarray:
+    src_blue = src[:, :, 0]
+    ref_blue = ref[:, :, 0]
+    matched_blue = histogram_matching_color(src_blue, ref_blue)
+
+    src_green = src[:, :, 1]
+    ref_green = ref[:, :, 1]
+    matched_green = histogram_matching_color(src_green, ref_green)
+
+    src_red = src[:, :, 2]
+    ref_red = ref[:, :, 2]
+    matched_red = histogram_matching_color(src_red, ref_red)
+
+    match_src = np.zeros(shape=src.shape, dtype=src.dtype)
+    match_src[:, :, 0] = matched_blue
+    match_src[:, :, 1] = matched_green
+    match_src[:, :, 2] = matched_red
+
+    return match_src
 
 
 def main():
