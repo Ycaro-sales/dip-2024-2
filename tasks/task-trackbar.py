@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 
 alpha_slider_max = 100
-title_window = 'H'
+title_window = "H"
 
 img1 = cv.imread("./images.jpeg")
 img2 = cv.imread("./hades.jpeg")
@@ -43,6 +43,7 @@ def on_trackbar(scalar_index):
         elif scalar_index == 2:
             new_image = new_linear_combination(new_beta=new_scalar)
         cv.imshow(title_window, new_image)
+
     return change_scalar
 
 

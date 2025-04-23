@@ -24,39 +24,16 @@ Notes:
 - You can assume the input images are already loaded and in RGB format (not BGR).
 """
 
+from typing import Callable
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-# como usar:
-# Colocar o slice como indice de uma imagem_rgb(shape=(x,y,3)) retornara apenas
-# a cor do slice utilizado
-# exemplo:
-# imagem_rgb[SLICE_RGB_IMAGE_RED] == imagem_red
-SLICE_RED_RGB_IMAGE = np.s_[:, :, 0]
-SLICE_GREEN_RGB_IMAGE = np.s_[:, :, 1]
-SLICE_BLUE_RGB_IMAGE = np.s_[:, :, 2]
-
-RGB_SLICES_ARRAY = [SLICE_RED_RGB_IMAGE, SLICE_GREEN_RGB_IMAGE, SLICE_BLUE_RGB_IMAGE]
-
 RESOLUTION_8_BIT_DEPTH = 2**8
 
 
-def create_rgb_image_histograms(img: np.ndarray) -> np.ndarray:
-    histogram_img_r, _ = np.histogram(img[SLICE_RED_RGB_IMAGE], bins=256)
-    histogram_img_g, _ = np.histogram(img[SLICE_GREEN_RGB_IMAGE], bins=256)
-    histogram_img_b, _ = np.histogram(img[SLICE_BLUE_RGB_IMAGE], bins=256)
-
-    rgb_img_histograms = np.zeros(shape=(3, 256), dtype=int)
-    rgb_img_histograms[0] = histogram_img_r
-    rgb_img_histograms[1] = histogram_img_g
-    rgb_img_histograms[2] = histogram_img_b
-
-    return rgb_img_histograms
-
-
-def create_histogram_equalizer_function(img: np.ndarray) -> np.vectorize:
+def create_histogram_equalizer_function(img: np.ndarray) -> Callable:
     img_histogram, _ = np.histogram(img, bins=256)
     total_px = img.size
 
@@ -64,13 +41,12 @@ def create_histogram_equalizer_function(img: np.ndarray) -> np.vectorize:
         cumulative_sum_r = img_histogram.cumsum()[r]
         return np.uint8(np.rint((cumulative_sum_r / total_px) * RESOLUTION_8_BIT_DEPTH))
 
-    return np.vectorize(equalizer)
+    return equalizer
 
 
 def histogram_equalization(img: np.ndarray):
-    equalize_hist = create_histogram_equalizer_function(img)
-    equalized_img = equalize_hist(img.flatten())
-    equalized_img = equalized_img.reshape(img.shape)
+    equalizer = create_histogram_equalizer_function(img)
+    equalized_img = np.apply_over_axes(equalizer, img, img.shape)
 
     return equalized_img
 
@@ -127,17 +103,6 @@ def rgb_histogram_equalization(img: np.ndarray) -> np.ndarray:
 def match_histograms_rgb(
     source_img: np.ndarray, reference_img: np.ndarray
 ) -> np.ndarray:
-    matched_histogram_rgb_image = np.zeros(shape=source_img.shape)
-
-    for color_slice in RGB_SLICES_ARRAY:
-        source_img_color_slice = source_img[color_slice]
-        reference_img_color_slice = reference_img[color_slice]
-
-        matched_histogram_rgb_image[color_slice] = match_histograms(
-            source_img_color_slice, reference_img_color_slice
-        )
-
-    return matched_histogram_rgb_image
 
 
 def main():

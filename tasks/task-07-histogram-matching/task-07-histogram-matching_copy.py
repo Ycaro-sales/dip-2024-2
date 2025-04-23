@@ -24,9 +24,18 @@ Notes:
 - You can assume the input images are already loaded and in RGB format (not BGR).
 """
 
+from typing import Callable
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
+
+
+def create_histogram_equalizer(img: np.ndarray) -> Callable:
+    histogram, _ = np.histogram(img)
+
+    def histogram_equalizer(value: int):
+        return int(histogram.cumsum()[value] / img.size * 255)
+
+    return histogram_equalizer
 
 
 def histogram_equalization(img: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -102,13 +111,6 @@ def main():
     src_img = cv.imread("./source.jpg")
     ref_img = cv.imread("./reference.jpg")
 
-    # eq_src_b, _ = histogram_equalization(src_img[:, :, 0])
-    # eq_src_g, _ = histogram_equalization(src_img[:, :, 1])
-    # eq_src_r, _ = histogram_equalization(src_img[:, :, 2])
-    # eq_src = np.zeros(shape=src_img.shape, dtype=src_img.dtype)
-    # eq_src[:, :, 0] = eq_src_b
-    # eq_src[:, :, 1] = eq_src_g
-    # eq_src[:, :, 2] = eq_src_r
     inv_src = np.zeros(shape=src_img.shape, dtype=np.uint8)
 
     inv_src_b = histogram_matching(src_img[:, :, 0], ref_img[:, :, 0])
@@ -125,13 +127,6 @@ def main():
     cv.imshow("match source", inv_src_2)
 
     cv.waitKey(0)
-    #
-    # fig, axs = plt.subplots(2)
-    #
-    # axs[0].hist(src_img[:, :, 0].flatten(), bins=256)
-    # axs[1].hist(eq_src[:, :, 0].flatten(), bins=256)
-    #
-    # plt.show()
 
 
 if __name__ == "__main__":
