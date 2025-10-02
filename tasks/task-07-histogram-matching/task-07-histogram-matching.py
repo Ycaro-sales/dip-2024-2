@@ -27,7 +27,9 @@ Notes:
 from typing import Callable
 import cv2 as cv
 import numpy as np
+from skimage import exposure
 import matplotlib.pyplot as plt
+import skimage
 
 
 RESOLUTION_8_BIT_DEPTH = 2**8
@@ -46,7 +48,7 @@ def create_histogram_equalizer_function(img: np.ndarray) -> Callable:
 
 def histogram_equalization(img: np.ndarray):
     equalizer = create_histogram_equalizer_function(img)
-    equalized_img = np.apply_over_axes(equalizer, img, img.shape)
+    equalized_img = np.apply_over_axes(equalizer, img, 0)
 
     return equalized_img
 
@@ -81,47 +83,21 @@ def match_histograms(source_img: np.ndarray, reference_img: np.ndarray) -> np.nd
     return matched_histogram_image
 
 
-# OK
-def rgb_histogram_equalization(img: np.ndarray) -> np.ndarray:
-    img_red = img[SLICE_RED_RGB_IMAGE]
-    img_green = img[SLICE_GREEN_RGB_IMAGE]
-    img_blue = img[SLICE_BLUE_RGB_IMAGE]
-
-    equalized_red = histogram_equalization(img_red)
-    equalized_green = histogram_equalization(img_green)
-    equalized_blue = histogram_equalization(img_blue)
-
-    equalized_rgb_img = np.zeros(shape=img.shape, dtype=img.dtype)
-
-    equalized_rgb_img[SLICE_RED_RGB_IMAGE] = equalized_red
-    equalized_rgb_img[SLICE_GREEN_RGB_IMAGE] = equalized_green
-    equalized_rgb_img[SLICE_BLUE_RGB_IMAGE] = equalized_blue
-
-    return equalized_rgb_img
-
-
-def match_histograms_rgb(
-    source_img: np.ndarray, reference_img: np.ndarray
-) -> np.ndarray:
-
-
 def main():
-    source_img = cv.imread("./source.jpg")
-    reference_img = cv.imread("./reference.jpg")
+    source_img = cv.imread("./source.jpg", cv.IMREAD_GRAYSCALE)
+    reference_img = cv.imread("./reference.jpg", cv.IMREAD_GRAYSCALE)
 
     print(source_img.shape)
     print(reference_img.shape)
 
-    histogram_r, histogram_g, histogram_b = create_rgb_image_histograms(source_img)
-
-    equalized_source_img = rgb_histogram_equalization(source_img)
-
-    e_r, e_g, e_b = create_rgb_image_histograms(equalized_source_img)
+    equalized_source_img = histogram_equalization(source_img)
+    equalized_source_img_cv = skimage.exposure.match_histograms(
+        source_img, reference_img
+    )
 
     cv.imshow("source rgb", source_img)
     cv.imshow("equalized source rgb", equalized_source_img)
-
-    print(histogram_r.shape)
+    cv.imshow("equalized source opencv", equalized_source_img_cv)
 
     # fig, axs = plt.subplots(2, 3)
     # axs[0, 0].bar(range(0, 256), histogram_r)
